@@ -16,14 +16,83 @@ resource "aws_security_group" "images_webserver_sg" {
   }
 }
 
-resource "aws_instance" "webserver" {
-  ami = "ami-466768ac"
+resource "aws_launch_configuration" "webserver_launch_configuration" {
+  image_id = "ami-466768ac"
   instance_type = "t1.micro"
-  vpc_security_group_ids = ["${aws_security_group.images_webserver_sg.id}"]
-  subnet_id = "${aws_subnet.images_public_subnet.id}"
+  security_groups = ["${aws_security_group.images_webserver_sg.id}"]
   associate_public_ip_address = true
-
-  tags {
-    Name = "Images Web Server"
+  name = "webserver_launch_configuration"
+  lifecycle {
+    create_before_destroy = true
   }
+}
+
+resource "aws_autoscaling_group" "webserver_autoscaling" {
+  max_size = 2
+  min_size = 1
+  name = "webserver_autoscaling"
+  vpc_zone_identifier = ["${aws_subnet.images_public_subnet.id}"]
+  launch_configuration = "${aws_launch_configuration.webserver_launch_configuration.name}"
+  health_check_grace_period = 300
+  health_check_type = "EC2"
+
+  tag {
+    key = "Name"
+    propagate_at_launch = true
+    value = "Images Web Server"
+  }
+}
+
+# Scale up
+resource "aws_autoscaling_policy" "webserver_cpu_policy_scaleup" {
+  autoscaling_group_name = "${aws_autoscaling_group.webserver_autoscaling.name}"
+  name = "webserver_cpu_policy_scaleup"
+  adjustment_type = "ChangeInCapacity"
+  scaling_adjustment = 1
+  cooldown = 300
+  policy_type = "SimpleScaling"
+}
+
+resource "aws_cloudwatch_metric_alarm" "webserver_cpu_alarm_scaleup" {
+  alarm_name = "webserver_cpu_alarm_scaleup"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods = 2
+  metric_name = "CPUUtilization"
+  namespace = "AWS/EC2"
+  period = 120
+  statistic = "Average"
+  threshold = 50
+  dimensions {
+    AutoScalingGroupName = "${aws_autoscaling_group.webserver_autoscaling.name}"
+  }
+
+  alarm_description = "This metric monitors ec2 cpu utilization"
+  alarm_actions = ["${aws_autoscaling_policy.webserver_cpu_policy_scaleup.arn}"]
+}
+
+# Scale down
+resource "aws_autoscaling_policy" "webserver_cpu_policy_scaledown" {
+  autoscaling_group_name = "${aws_autoscaling_group.webserver_autoscaling.name}"
+  name = "webserver_cpu_policy_scaledown"
+  adjustment_type = "ChangeInCapacity"
+  scaling_adjustment = -1
+  cooldown = 300
+  policy_type = "SimpleScaling"
+}
+
+resource "aws_cloudwatch_metric_alarm" "webserver_cpu_alarm_scaledown" {
+  alarm_name = "webserver_cpu_alarm_scaledown"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods = 2
+  metric_name = "CPUUtilization"
+  namespace = "AWS/EC2"
+  period = 120
+  statistic = "Average"
+  threshold = 5
+  dimensions {
+    AutoScalingGroupName = "${aws_autoscaling_group.webserver_autoscaling.name}"
+  }
+
+  alarm_description = "This metric monitors ec2 cpu utilization"
+  alarm_actions = ["${aws_autoscaling_policy.webserver_cpu_policy_scaledown.arn}"]
 }
