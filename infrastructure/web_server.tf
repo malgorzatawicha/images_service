@@ -19,8 +19,8 @@ resource "aws_security_group" "images_webserver_sg" {
 resource "aws_lb" "webserver_load_balancer" {
   name = "webserver-load-balancer"
   internal = false
-  load_balancer_type = "network"
-  subnets = ["${aws_subnet.images_public_subnet.id}"]
+  load_balancer_type = "application"
+  subnets = ["${aws_subnet.images_public_subnet1.id}", "${aws_subnet.images_public_subnet2.id}"]
 }
 
 resource "aws_lb_listener" "webserver_load_balancer_listener" {
@@ -30,22 +30,22 @@ resource "aws_lb_listener" "webserver_load_balancer_listener" {
   }
   load_balancer_arn = "${aws_lb.webserver_load_balancer.arn}"
   port = 80
-  protocol = "TCP"
+  protocol = "HTTP"
 }
 
 resource "aws_lb_target_group" "webserver_load_balancer_target_group" {
   port = 80
-  protocol = "TCP"
+  protocol = "HTTP"
   vpc_id = "${aws_vpc.images_vpc.id}"
   name = "webserver-target-group"
-  stickiness = []
   health_check {
     interval = 30
-    protocol = "TCP"
+    protocol = "HTTP"
     healthy_threshold = 3
     unhealthy_threshold = 3
-    matcher = ""
-    path = ""
+    matcher = "200"
+    path = "/"
+    timeout = 5
   }
   tags {
     Name = "Web Server Target Group"
@@ -70,7 +70,7 @@ resource "aws_autoscaling_group" "webserver_autoscaling" {
   max_size = 2
   min_size = 1
   name = "webserver_autoscaling"
-  vpc_zone_identifier = ["${aws_subnet.images_public_subnet.id}"]
+  vpc_zone_identifier = ["${aws_subnet.images_public_subnet1.id}", "${aws_subnet.images_public_subnet2.id}"]
   launch_configuration = "${aws_launch_configuration.webserver_launch_configuration.name}"
   health_check_grace_period = 300
   health_check_type = "ELB"

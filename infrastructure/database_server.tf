@@ -6,7 +6,7 @@ resource "aws_security_group" "images_dbserver_sg" {
     from_port = 27017
     protocol = "tcp"
     to_port = 27017
-    cidr_blocks = ["${aws_subnet.images_public_subnet.cidr_block}"]
+    cidr_blocks = ["${aws_subnet.images_public_subnet1.cidr_block}", "${aws_subnet.images_public_subnet2.cidr_block}"]
   }
 
   vpc_id = "${aws_vpc.images_vpc.id}"

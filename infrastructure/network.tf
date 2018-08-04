@@ -6,7 +6,7 @@ resource "aws_vpc" "images_vpc" {
   }
 }
 
-resource "aws_subnet" "images_public_subnet" {
+resource "aws_subnet" "images_public_subnet1" {
   cidr_block = "10.0.1.0/24"
   vpc_id = "${aws_vpc.images_vpc.id}"
   availability_zone = "eu-west-1a"
@@ -16,10 +16,19 @@ resource "aws_subnet" "images_public_subnet" {
   }
 }
 
-resource "aws_subnet" "images_private_subnet" {
+resource "aws_subnet" "images_public_subnet2" {
   cidr_block = "10.0.2.0/24"
   vpc_id = "${aws_vpc.images_vpc.id}"
   availability_zone = "eu-west-1b"
+
+  tags {
+    Name = "Images Public Subnet"
+  }
+}
+resource "aws_subnet" "images_private_subnet" {
+  cidr_block = "10.0.3.0/24"
+  vpc_id = "${aws_vpc.images_vpc.id}"
+  availability_zone = "eu-west-1c"
 
   tags {
     Name = "Images Private Subnet"
@@ -46,7 +55,12 @@ resource "aws_route_table" "images_public_rt" {
   }
 }
 
-resource "aws_route_table_association" "images_public_rt" {
+resource "aws_route_table_association" "images_public1_rt" {
   route_table_id = "${aws_route_table.images_public_rt.id}"
-  subnet_id = "${aws_subnet.images_public_subnet.id}"
+  subnet_id = "${aws_subnet.images_public_subnet1.id}"
+}
+
+resource "aws_route_table_association" "images_public2_rt" {
+  route_table_id = "${aws_route_table.images_public_rt.id}"
+  subnet_id = "${aws_subnet.images_public_subnet2.id}"
 }
