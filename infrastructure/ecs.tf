@@ -2,10 +2,6 @@ resource "aws_ecr_repository" "images_application" {
   name = "images/application"
 }
 
-resource "aws_ecr_repository" "images_database" {
-  name = "images/database"
-}
-
 resource "aws_ecs_cluster" "images_cluster" {
   name = "images_cluster"
 }
@@ -15,7 +11,6 @@ data "template_file" "web_task" {
 
   vars {
     web_server_image = "${aws_ecr_repository.images_application.repository_url}"
-    database_image = "${aws_ecr_repository.images_database.repository_url}"
     db_user = "${var.db_user}"
     db_password = "${var.db_password}"
   }
