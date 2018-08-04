@@ -2,9 +2,6 @@
   {
     "name": "images",
     "image": "${web_server_image}",
-    "links": [
-      "database"
-    ],
     "essential": true,
     "portMappings": [
       {
@@ -13,39 +10,6 @@
       }
     ],
     "cpu": 128,
-    "memory": 128,
-    "environment": [
-      {
-        "name": "MONGODB_USER",
-        "value": "${db_user}"
-      },
-      {
-        "name": "MONGODB_PASSWORD",
-        "value": "${db_password}"
-      }
-    ]
-  },
-  {
-    "name": "database",
-    "image": "${database_image}",
-    "essential": true,
-    "portMappings": [
-      {
-        "containerPort": 27017,
-        "hostPort": 27017
-      }
-    ],
-    "cpu": 128,
-    "memory": 128,
-    "environment": [
-      {
-        "name": "MONGODB_USER",
-        "value": "${db_user}"
-      },
-      {
-        "name": "MONGODB_PASSWORD",
-        "value": "${db_password}"
-      }
-    ]
+    "memory": 128
   }
 ]
