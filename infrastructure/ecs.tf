@@ -38,6 +38,6 @@ resource "aws_ecs_service" "images_ecs_service" {
   load_balancer {
     container_name = "images"
     container_port = 80
-    target_group_arn = "${aws_lb_target_group.webserver_load_balancer_target_group.arn}"
+    target_group_arn = "${aws_lb_target_group.images_load_balancer_target_group.arn}"
   }
 }

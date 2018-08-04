@@ -1,25 +1,25 @@
-resource "aws_lb" "webserver_load_balancer" {
-  name = "webserver-load-balancer"
+resource "aws_lb" "images_load_balancer" {
+  name = "images-load-balancer"
   internal = false
   load_balancer_type = "application"
   subnets = ["${aws_subnet.images_public_subnet1.id}", "${aws_subnet.images_public_subnet2.id}"]
 }
 
-resource "aws_lb_listener" "webserver_load_balancer_listener" {
+resource "aws_lb_listener" "images_load_balancer_listener" {
   "default_action" {
-    target_group_arn = "${aws_lb_target_group.webserver_load_balancer_target_group.arn}"
+    target_group_arn = "${aws_lb_target_group.images_load_balancer_target_group.arn}"
     type = "forward"
   }
-  load_balancer_arn = "${aws_lb.webserver_load_balancer.arn}"
+  load_balancer_arn = "${aws_lb.images_load_balancer.arn}"
   port = 80
   protocol = "HTTP"
 }
 
-resource "aws_lb_target_group" "webserver_load_balancer_target_group" {
+resource "aws_lb_target_group" "images_load_balancer_target_group" {
   port = 80
   protocol = "HTTP"
   vpc_id = "${aws_vpc.images_vpc.id}"
-  name = "webserver-target-group"
+  name = "images-target-group"
   health_check {
     interval = 30
     protocol = "HTTP"
@@ -30,19 +30,19 @@ resource "aws_lb_target_group" "webserver_load_balancer_target_group" {
     timeout = 5
   }
   tags {
-    Name = "Web Server Target Group"
+    Name = "Images Load Balancer Target Group"
   }
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_launch_configuration" "webserver_launch_configuration" {
+resource "aws_launch_configuration" "images_launch_configuration" {
   image_id = "${var.image}"
   instance_type = "t1.micro"
   security_groups = ["${aws_security_group.images_sg.id}"]
   associate_public_ip_address = true
-  name = "webserver_launch_configuration"
+  name = "images_launch_configuration"
 
   user_data = <<EOF
 #!/bin/bash
@@ -54,12 +54,12 @@ EOF
   }
 }
 
-resource "aws_autoscaling_group" "webserver_autoscaling" {
+resource "aws_autoscaling_group" "images_autoscaling" {
   max_size = 2
   min_size = 1
-  name = "webserver_autoscaling"
+  name = "images_autoscaling"
   vpc_zone_identifier = ["${aws_subnet.images_public_subnet1.id}", "${aws_subnet.images_public_subnet2.id}"]
-  launch_configuration = "${aws_launch_configuration.webserver_launch_configuration.name}"
+  launch_configuration = "${aws_launch_configuration.images_launch_configuration.name}"
   health_check_grace_period = 300
   health_check_type = "ELB"
 
@@ -71,17 +71,17 @@ resource "aws_autoscaling_group" "webserver_autoscaling" {
 }
 
 # Scale up
-resource "aws_autoscaling_policy" "webserver_cpu_policy_scaleup" {
-  autoscaling_group_name = "${aws_autoscaling_group.webserver_autoscaling.name}"
-  name = "webserver_cpu_policy_scaleup"
+resource "aws_autoscaling_policy" "images_cpu_policy_scaleup" {
+  autoscaling_group_name = "${aws_autoscaling_group.images_autoscaling.name}"
+  name = "images_cpu_policy_scaleup"
   adjustment_type = "ChangeInCapacity"
   scaling_adjustment = 1
   cooldown = 300
   policy_type = "SimpleScaling"
 }
 
-resource "aws_cloudwatch_metric_alarm" "webserver_cpu_alarm_scaleup" {
-  alarm_name = "webserver_cpu_alarm_scaleup"
+resource "aws_cloudwatch_metric_alarm" "images_cpu_alarm_scaleup" {
+  alarm_name = "images_cpu_alarm_scaleup"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods = 2
   metric_name = "CPUUtilization"
@@ -90,25 +90,25 @@ resource "aws_cloudwatch_metric_alarm" "webserver_cpu_alarm_scaleup" {
   statistic = "Average"
   threshold = 50
   dimensions {
-    AutoScalingGroupName = "${aws_autoscaling_group.webserver_autoscaling.name}"
+    AutoScalingGroupName = "${aws_autoscaling_group.images_autoscaling.name}"
   }
 
   alarm_description = "This metric monitors ec2 cpu utilization"
-  alarm_actions = ["${aws_autoscaling_policy.webserver_cpu_policy_scaleup.arn}"]
+  alarm_actions = ["${aws_autoscaling_policy.images_cpu_policy_scaleup.arn}"]
 }
 
 # Scale down
-resource "aws_autoscaling_policy" "webserver_cpu_policy_scaledown" {
-  autoscaling_group_name = "${aws_autoscaling_group.webserver_autoscaling.name}"
-  name = "webserver_cpu_policy_scaledown"
+resource "aws_autoscaling_policy" "images_cpu_policy_scaledown" {
+  autoscaling_group_name = "${aws_autoscaling_group.images_autoscaling.name}"
+  name = "images_cpu_policy_scaledown"
   adjustment_type = "ChangeInCapacity"
   scaling_adjustment = -1
   cooldown = 300
   policy_type = "SimpleScaling"
 }
 
-resource "aws_cloudwatch_metric_alarm" "webserver_cpu_alarm_scaledown" {
-  alarm_name = "webserver_cpu_alarm_scaledown"
+resource "aws_cloudwatch_metric_alarm" "images_cpu_alarm_scaledown" {
+  alarm_name = "images_cpu_alarm_scaledown"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods = 2
   metric_name = "CPUUtilization"
@@ -117,9 +117,9 @@ resource "aws_cloudwatch_metric_alarm" "webserver_cpu_alarm_scaledown" {
   statistic = "Average"
   threshold = 5
   dimensions {
-    AutoScalingGroupName = "${aws_autoscaling_group.webserver_autoscaling.name}"
+    AutoScalingGroupName = "${aws_autoscaling_group.images_autoscaling.name}"
   }
 
   alarm_description = "This metric monitors ec2 cpu utilization"
-  alarm_actions = ["${aws_autoscaling_policy.webserver_cpu_policy_scaledown.arn}"]
+  alarm_actions = ["${aws_autoscaling_policy.images_cpu_policy_scaledown.arn}"]
 }
