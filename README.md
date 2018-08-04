@@ -5,6 +5,22 @@
 - `terraform`
 - Account on AWS
 
+### Launch project locally
+
+Build docker image:
+```
+cd <project_directory>/app
+docker build -t images/application .
+```
+Run docker:
+```
+docker run --rm -p 80:80 images/application
+```
+
+And visit in browser:
+```
+http://localhost:80
+```
 ### Launch project in production
 
 Clone directory:
