@@ -11,8 +11,6 @@ data "template_file" "web_task" {
 
   vars {
     web_server_image = "${aws_ecr_repository.images_application.repository_url}"
-    db_user = "${var.db_user}"
-    db_password = "${var.db_password}"
   }
 }
 
