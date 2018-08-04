@@ -25,15 +25,6 @@ resource "aws_subnet" "images_public_subnet2" {
     Name = "Images Public Subnet"
   }
 }
-resource "aws_subnet" "images_private_subnet" {
-  cidr_block = "10.0.3.0/24"
-  vpc_id = "${aws_vpc.images_vpc.id}"
-  availability_zone = "eu-west-1c"
-
-  tags {
-    Name = "Images Private Subnet"
-  }
-}
 
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = "${aws_vpc.images_vpc.id}"
