@@ -10,6 +10,16 @@
       }
     ],
     "cpu": 128,
-    "memory": 128
+    "memory": 128,
+    "environment": [
+      {
+        "name": "AWS_ACCESS_KEY_ID",
+        "value": "${aws_access_key}"
+      },
+      {
+        "name": "AWS_SECRET_ACCESS_KEY",
+        "value": "${aws_secret_key}"
+      }
+    ]
   }
 ]

@@ -11,6 +11,8 @@ data "template_file" "web_task" {
 
   vars {
     web_server_image = "${aws_ecr_repository.images_application.repository_url}"
+    aws_access_key = "${var.access_key}"
+    aws_secret_key = "${var.secret_key}"
   }
 }
 
