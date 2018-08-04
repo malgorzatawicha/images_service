@@ -1,3 +1,29 @@
+resource "aws_iam_role" "images_ecs_role" {
+  name = "images_ecs_role"
+  assume_role_policy  = "${data.aws_iam_policy_document.images_iam_policy.json}"
+}
+
+data "aws_iam_policy_document" "images_iam_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "images_policy_attachment" {
+  role       = "${aws_iam_role.images_ecs_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+resource "aws_iam_instance_profile" "images_ecs_ec2_instance_profile" {
+  name = "ec2_instance_profile"
+  role = "${aws_iam_role.images_ecs_role.name}"
+}
+
 resource "aws_lb" "images_load_balancer" {
   name = "images-load-balancer"
   internal = false
@@ -41,6 +67,7 @@ resource "aws_lb_target_group" "images_load_balancer_target_group" {
 resource "aws_launch_configuration" "images_launch_configuration" {
   image_id = "${var.image}"
   instance_type = "t1.micro"
+  iam_instance_profile = "${aws_iam_instance_profile.images_ecs_ec2_instance_profile.id}"
   security_groups = ["${aws_security_group.images_sg.id}"]
   associate_public_ip_address = true
   name = "images_launch_configuration"
