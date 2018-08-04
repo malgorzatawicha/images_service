@@ -14,7 +14,7 @@ docker build -t images/application .
 ```
 Run docker:
 ```
-docker run --rm -p 80:80 images/application
+docker run --rm -p 80:80 -e AWS_ACCESS_KEY_ID='<YOUR_AWS_ACCESS_KEY>' -e AWS_SECRET_ACCESS_KEY='YOUR_AWS_SECRET_KEY' images/application
 ```
 
 And visit in browser:
