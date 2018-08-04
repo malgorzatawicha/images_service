@@ -61,6 +61,12 @@ resource "aws_launch_configuration" "webserver_launch_configuration" {
   security_groups = ["${aws_security_group.images_webserver_sg.id}"]
   associate_public_ip_address = true
   name = "webserver_launch_configuration"
+
+  user_data = <<EOF
+#!/bin/bash
+echo "ECS_CLUSTER=images_cluster" >> /etc/ecs/ecs.config
+EOF
+
   lifecycle {
     create_before_destroy = true
   }
