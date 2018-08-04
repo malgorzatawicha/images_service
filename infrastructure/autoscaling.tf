@@ -32,6 +32,9 @@ resource "aws_lb" "images_load_balancer" {
   subnets = ["${aws_subnet.images_public_subnet1.id}", "${aws_subnet.images_public_subnet2.id}"]
 }
 
+output "images_load_balancer" {
+  value = "${aws_lb.images_load_balancer.dns_name}"
+}
 resource "aws_lb_listener" "images_load_balancer_listener" {
   "default_action" {
     target_group_arn = "${aws_lb_target_group.images_load_balancer_target_group.arn}"

@@ -42,6 +42,8 @@ mv terraform.tfvars.default terraform.tfvars
 nano terraform.tfvars
 ```
 
+Project will be accessible under url returned in output of `terraform apply`.
+
 ##### Push dockers to AWS
 
 Build docker image:
