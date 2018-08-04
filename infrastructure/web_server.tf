@@ -73,7 +73,7 @@ resource "aws_autoscaling_group" "webserver_autoscaling" {
   vpc_zone_identifier = ["${aws_subnet.images_public_subnet.id}"]
   launch_configuration = "${aws_launch_configuration.webserver_launch_configuration.name}"
   health_check_grace_period = 300
-  health_check_type = "EC2"
+  health_check_type = "ELB"
 
   tag {
     key = "Name"
