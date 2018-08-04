@@ -16,6 +16,45 @@ resource "aws_security_group" "images_webserver_sg" {
   }
 }
 
+resource "aws_lb" "webserver_load_balancer" {
+  name = "webserver-load-balancer"
+  internal = false
+  load_balancer_type = "network"
+  subnets = ["${aws_subnet.images_public_subnet.id}"]
+}
+
+resource "aws_lb_listener" "webserver_load_balancer_listener" {
+  "default_action" {
+    target_group_arn = "${aws_lb_target_group.webserver_load_balancer_target_group.arn}"
+    type = "forward"
+  }
+  load_balancer_arn = "${aws_lb.webserver_load_balancer.arn}"
+  port = 80
+  protocol = "TCP"
+}
+
+resource "aws_lb_target_group" "webserver_load_balancer_target_group" {
+  port = 80
+  protocol = "TCP"
+  vpc_id = "${aws_vpc.images_vpc.id}"
+  name = "webserver-target-group"
+  stickiness = []
+  health_check {
+    interval = 30
+    protocol = "TCP"
+    healthy_threshold = 3
+    unhealthy_threshold = 3
+    matcher = ""
+    path = ""
+  }
+  tags {
+    Name = "Web Server Target Group"
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_launch_configuration" "webserver_launch_configuration" {
   image_id = "ami-466768ac"
   instance_type = "t1.micro"
