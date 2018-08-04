@@ -2,6 +2,7 @@ resource "aws_lb" "images_load_balancer" {
   name = "images-load-balancer"
   internal = false
   load_balancer_type = "application"
+  security_groups = ["${aws_security_group.images_sg.id}"]
   subnets = ["${aws_subnet.images_public_subnet1.id}", "${aws_subnet.images_public_subnet2.id}"]
 }
 
