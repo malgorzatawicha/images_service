@@ -56,7 +56,7 @@ resource "aws_lb_target_group" "webserver_load_balancer_target_group" {
 }
 
 resource "aws_launch_configuration" "webserver_launch_configuration" {
-  image_id = "ami-466768ac"
+  image_id = "${var.image}"
   instance_type = "t1.micro"
   security_groups = ["${aws_security_group.images_webserver_sg.id}"]
   associate_public_ip_address = true
