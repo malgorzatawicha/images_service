@@ -82,3 +82,21 @@ resource "aws_route_table_association" "images_public2_rt" {
   route_table_id = "${aws_route_table.images_public_rt.id}"
   subnet_id = "${aws_subnet.images_public_subnet2.id}"
 }
+
+resource "aws_security_group" "images_sg" {
+  name = "images_sg"
+  description = "Allow incoming HTTP connections"
+
+  ingress {
+    from_port = 80
+    protocol = "tcp"
+    to_port = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  vpc_id = "${aws_vpc.images_vpc.id}"
+
+  tags {
+    Name = "Images Web Server Security Group"
+  }
+}

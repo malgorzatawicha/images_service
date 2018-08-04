@@ -1,21 +1,3 @@
-resource "aws_security_group" "images_webserver_sg" {
-  name = "images_webserver_sg"
-  description = "Allow incoming HTTP connections"
-
-  ingress {
-    from_port = 80
-    protocol = "tcp"
-    to_port = 80
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  vpc_id = "${aws_vpc.images_vpc.id}"
-
-  tags {
-    Name = "Images Web Server Security Group"
-  }
-}
-
 resource "aws_lb" "webserver_load_balancer" {
   name = "webserver-load-balancer"
   internal = false
@@ -58,7 +40,7 @@ resource "aws_lb_target_group" "webserver_load_balancer_target_group" {
 resource "aws_launch_configuration" "webserver_launch_configuration" {
   image_id = "ami-466768ac"
   instance_type = "t1.micro"
-  security_groups = ["${aws_security_group.images_webserver_sg.id}"]
+  security_groups = ["${aws_security_group.images_sg.id}"]
   associate_public_ip_address = true
   name = "webserver_launch_configuration"
   lifecycle {
