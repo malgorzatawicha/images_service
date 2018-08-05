@@ -15,8 +15,9 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+const router = express.Router();
 
-app.get('/', (request, response) => {
+router.get('/', (request, response) => {
 
     const database = new AWS.DynamoDB({apiVersion: '2012-10-08'});
     const params = {
@@ -36,7 +37,9 @@ app.get('/', (request, response) => {
 });
 
 // @todo add pagination to request
-app.get('/v1/images', function (request, response) {
+
+router.route('/images')
+    .get(function (request, response) {
     response.json({
         data: [
             {
@@ -81,9 +84,9 @@ app.get('/v1/images', function (request, response) {
             }
         ]
     });
-});
+})
 
-app.post('/v1/images', function (request, response) {
+    .post(function (request, response) {
     const {sourceUrl, imageName, sizes} = request.body;
     if (!sourceUrl || !imageName || !sizes) {
         responseMissingFields(sourceUrl, imageName, sizes, response);
@@ -96,7 +99,8 @@ app.post('/v1/images', function (request, response) {
 
     const id = "3";
     response.status(202).append("Location", "/v1/queue/" + id).send();
-});
+})
+;
 
 
 function getInvalidFields(sourceUrl, imageName, sizes) {
@@ -157,6 +161,7 @@ function responseMissingFields(sourceUrl, imageName, sizes, response) {
     });
 }
 
+app.use('/v1', router);
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
