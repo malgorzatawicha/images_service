@@ -84,22 +84,23 @@ router.route('/images/:id')
 
         const params = {
             TableName: config.aws_table_name,
-            KeyConditionExpression: 'id = :id',
-            ExpressionAttributeValues: {
-                ':id': request.params.id
+            Key: {
+                'id': request.params.id
             }
         };
 
-        database.query(params, function (error, data) {
+        database.get(params, function (error, data) {
             if (error) {
                 return responseInternalServerError(response);
             }
-            const {Items} = data;
-            if (!Items || Items.length === 0) {
+
+            const {Item} = data;
+
+            if (!Item) {
                 return response.status(404).send();
             }
             return response.json({
-                data: Items[0]
+                data: Item
             });
         });
     })
