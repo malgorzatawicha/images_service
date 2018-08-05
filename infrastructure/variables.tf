@@ -8,3 +8,5 @@ variable "region" {
 variable "image" {
   default = "ami-39d530d4"
 }
+
+variable "s3_bucket" {}
