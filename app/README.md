@@ -73,7 +73,7 @@ POST /v1/images/
 {
   sourceUrl: www.google.com/image3
   imageName: my new image
-  sizes: [width50, width100]
+  sizes: [50, 100]
 }
 ```
 
@@ -93,7 +93,7 @@ POST /v1/images/
 
 {
   sourceUrl: www.google.com/image3
-  sizes: [width50, width100]
+  sizes: [50, 100]
 }
 ```
 
@@ -123,7 +123,7 @@ POST /v1/images/
 {
   sourceUrl: www.google.com/image3
   imageName: some name
-  sizes: [strange_size, width100]
+  sizes: [strange_size, 100]
 }
 ```
 
@@ -137,7 +137,7 @@ error {
     error: FIELDS_VALIDATION_ERROR
     description: One or more fields raised validation errors.
     fields {
-        sizes: Wrong image size.
+        sizes: Not all of sizes is numeric.
     }
 }        
 ```
