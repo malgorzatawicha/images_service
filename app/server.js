@@ -38,8 +38,7 @@ router.route('/images')
         };
         database.scan(params, function(error, data) {
             if (error) {
-                console.log(error);
-                return responseInternalServerError(response);
+                return responseInternalServerError(response, error);
             }
             const { Items } = data;
             return response.send({data: Items.map(assembleItem)});
@@ -70,7 +69,7 @@ router.route('/images')
         };
         database.put(params, function (error) {
             if (error) {
-                return responseInternalServerError(response);
+                return responseInternalServerError(response, error);
             }
             return response.status(202).append("Location", "/v1/queue/" + id).send();
         })
@@ -89,7 +88,7 @@ router.route('/images/:id')
 
         database.get(params, function (error, data) {
             if (error) {
-                return responseInternalServerError(response);
+                return responseInternalServerError(response, error);
             }
 
             const {Item} = data;
@@ -132,7 +131,7 @@ router.route('/images/:id')
                 if (error.code === 'ConditionalCheckFailedException') {
                     return response.status(404).send();
                 }
-                return responseInternalServerError(response);
+                return responseInternalServerError(response, error);
             }
             return response.status(202).append("Location", "/v1/queue/" + request.params.id).send();
         })
@@ -152,7 +151,7 @@ router.route('/images/:id')
                 if (error.code === 'ConditionalCheckFailedException') {
                     return response.status(204).send();
                 }
-                return responseInternalServerError(response);
+                return responseInternalServerError(response, error);
             }
             return response.status(202).send();
         })
@@ -229,9 +228,10 @@ function responseMissingFields(sourceUrl, imageName, sizes, response) {
     });
 }
 
-function responseInternalServerError(response) {
+function responseInternalServerError(response, error) {
     return response.status(500).send({
-        message: 'Internal server error'
+        message: 'Internal server error',
+        error: error
     });
 }
 
