@@ -147,6 +147,13 @@ router.route('/images/:id')
         response.status(202).append("Location", "/v1/queue/" + request.params.id).send();
 
     })
+    .delete(function (request, response) {
+        if (request.params.id === '1') {
+            return response.status(202).send();
+        }
+
+        return response.status(204).send();
+    })
 ;
 router.route('/queue/:id')
     .get(function (request, response) {
