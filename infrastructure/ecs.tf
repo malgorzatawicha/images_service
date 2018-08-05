@@ -35,4 +35,5 @@ resource "aws_ecs_service" "images_ecs_service" {
     container_port = 80
     target_group_arn = "${aws_lb_target_group.images_load_balancer_target_group.arn}"
   }
+  depends_on = ["aws_lb_listener.images_load_balancer_listener"]
 }
