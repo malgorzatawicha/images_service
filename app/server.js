@@ -1,6 +1,8 @@
 'use strict';
 
 const express = require('express');
+const bodyParser = require('body-parser');
+
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'eu-west-1'});
 
@@ -10,6 +12,10 @@ const HOST = '0.0.0.0';
 
 // App
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+
 app.get('/', (request, response) => {
 
     const database = new AWS.DynamoDB({apiVersion: '2012-10-08'});
@@ -75,6 +81,81 @@ app.get('/v1/images', function (request, response) {
         ]
     });
 });
+
+app.post('/v1/images', function (request, response) {
+    const {sourceUrl, imageName, sizes} = request.body;
+    if (!sourceUrl || !imageName || !sizes) {
+        responseMissingFields(sourceUrl, imageName, sizes, response);
+    }
+    const invalidFields = getInvalidFields(sourceUrl, imageName, sizes);
+
+    if (Object.keys(invalidFields).length > 0) {
+        responseInvalidFields(invalidFields, response);
+    }
+
+    const id = "3";
+    response.status(202).append("Location", "/v1/queue/" + id).send();
+});
+
+
+function getInvalidFields(sourceUrl, imageName, sizes) {
+    let invalidFields = {};
+    if (!validUrl(sourceUrl)) {
+        invalidFields.sourceUrl = 'Wrong url format';
+    }
+    if (!Array.isArray(sizes)) {
+        invalidFields.sizes = 'Is not array';
+    }
+    if (sizes.length === 0) {
+        invalidFields.sizes = 'Wrong count of sizes';
+    }
+
+    if (sizes.some(isNaN)) {
+        invalidFields.sizes = 'Not all of sizes is numeric';
+    }
+
+    return invalidFields;
+}
+
+function validUrl(str) {
+    const urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
+    const url = new RegExp(urlRegex, 'i');
+    return str.length < 2083 && url.test(str);
+}
+
+function responseInvalidFields(fields, response) {
+    response.status(422).send({
+        error: {
+            status: 422,
+            error: "FIELDS_VALIDATION_ERROR",
+            description: "One or more fields are raised validation errors.",
+            fields: fields
+        }
+    });
+}
+
+function responseMissingFields(sourceUrl, imageName, sizes, response) {
+    const message = 'Missing field.';
+    let errorFields = {};
+    if (!sourceUrl) {
+        errorFields.sourceUrl = message;
+    }
+    if (!imageName) {
+        errorFields.imageName = message;
+    }
+    if (!sizes) {
+        errorFields.sizes = message;
+    }
+    response.status(400).send({
+        error: {
+            status: 400,
+            error: "MISSING_DATA",
+            description: "One or more fields are missing.",
+            fields: errorFields
+        }
+    });
+}
+
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
