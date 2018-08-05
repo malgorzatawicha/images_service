@@ -1,0 +1,19 @@
+version: '3'
+services:
+  web:
+    build: .
+    links:
+      - database
+    ports:
+     - "80:80"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+  database:
+    image: "dwmkerr/dynamodb"
+    volumes:
+      - "./database/entrypoint.sh:/usr/entrypoint.sh"
+      - "./database/data:/data"
+    ports:
+      - "8000:8000"
+    entrypoint: ["/usr/entrypoint.sh"]

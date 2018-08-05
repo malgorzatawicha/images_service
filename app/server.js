@@ -4,7 +4,18 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const AWS = require('aws-sdk');
-AWS.config.update({region: 'eu-west-1'});
+const config = require('./config');
+if (process.env.NODE_ENV !== 'production') {
+    console.log(config.aws_local_config);
+    AWS.config.update(config.aws_local_config);
+} else {
+    console.log(config.aws_remote_config);
+    AWS.config.update(config.aws_remote_config);
+}
+const database = new AWS.DynamoDB.DocumentClient();
+const params = {
+    TableName: config.aws_table_name
+};
 
 // Constants
 const PORT = 80;
@@ -19,20 +30,20 @@ const router = express.Router();
 
 router.get('/', (request, response) => {
 
-    const database = new AWS.DynamoDB({apiVersion: '2012-10-08'});
-    const params = {
-        TableName: 'db_images',
-        Key: {
-            'imageId' : {S: '5'},
-        }
-    };
-
-    database.getItem(params, function(error, data) {
+    database.scan(params, function(error, data) {
+        console.log('scan');
         if (error) {
-            response.send(error);
-        } else {
-            response.send(data.Item);
+            console.log(error);
+            return response.status(500).send({
+                message: 'Internal server error'
+            });
         }
+        console.log(data);
+        const { Items } = data;
+        console.log(Items);
+        return response.send({
+            data: Items
+        });
     });
 });
 

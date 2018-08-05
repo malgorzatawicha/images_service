@@ -7,20 +7,16 @@
 
 ### Launch project locally
 
-Build docker image:
 ```
-cd <project_directory>/app
-docker build -t images/application .
-```
-Run docker:
-```
-docker run --rm -p 80:80 -e AWS_ACCESS_KEY_ID='<YOUR_AWS_ACCESS_KEY>' -e AWS_SECRET_ACCESS_KEY='YOUR_AWS_SECRET_KEY' images/application
+cd <project_directory>
+docker-compose up --build
 ```
 
 And visit in browser:
 ```
-http://localhost:80
+http://localhost:80/v1/
 ```
+
 ### Launch project in production
 
 Clone directory:
@@ -48,7 +44,7 @@ Project will be accessible under url returned in output of `terraform apply`.
 
 Build docker image:
 ```
-cd <project_directory>/app
+cd <project_directory>
 docker build -t images/application .
 docker tag images/application:latest <account_id>.dkr.ecr.eu-west-1.amazonaws.com/images/application:latest
 ```
