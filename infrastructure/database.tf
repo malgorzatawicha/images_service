@@ -8,6 +8,10 @@ resource "aws_dynamodb_table" "db_images" {
     name = "imageId"
     type = "S"
   }
+
+  stream_enabled = true
+  stream_view_type = "NEW_IMAGE"
+
   tags {
     Name = "db_images"
   }
