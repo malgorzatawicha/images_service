@@ -253,7 +253,7 @@ PUT /v1/images/5
 {
   sourceUrl: www.google.com/image3
   imageName: my new image
-  sizes: [width50, width100]
+  sizes: [50, 100]
 }
 ```
 
@@ -273,7 +273,7 @@ PUT /v1/images/5
 {
   sourceUrl: www.google.com/image5
   imageName: my new image
-  sizes: [width50, width100]
+  sizes: [50, 100]
 }
 ```
 
@@ -292,7 +292,7 @@ PUT /v1/images/3
 
 {
   sourceUrl: www.google.com/image3
-  sizes: [width50, width100]
+  sizes: [50, 100]
 }
 ```
 
@@ -321,7 +321,7 @@ PUT /v1/images/3
 {
   sourceUrl: www.google.com/image3
   imageName: some name
-  sizes: [strange_size, width100]
+  sizes: [strange_size, 100]
 }
 ```
 
