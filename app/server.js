@@ -6,7 +6,7 @@ const uuid = require('node-uuid');
 
 const AWS = require('aws-sdk');
 const config = require('./config');
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'PRODUCTION') {
     AWS.config.update(config.aws_local_config);
 } else {
     AWS.config.update(config.aws_remote_config);

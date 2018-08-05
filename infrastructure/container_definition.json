@@ -19,6 +19,10 @@
       {
         "name": "AWS_SECRET_ACCESS_KEY",
         "value": "${aws_secret_key}"
+      },
+      {
+        "name": "NODE_ENV",
+        "value": "PRODUCTION"
       }
     ]
   }
