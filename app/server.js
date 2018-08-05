@@ -65,8 +65,8 @@ router.route('/images')
             TableName: config.aws_table_name,
             Item: {
                 id: id,
-                url: sourceUrl,
-                name: imageName,
+                imageUrl: sourceUrl,
+                imageName: imageName,
                 sizes: sizes
             }
         };
@@ -105,10 +105,6 @@ router.route('/images/:id')
         });
     })
     .put(function (request, response) {
-        if (request.params.id !== '1') {
-            return response.status(404).send();
-        }
-
         const {sourceUrl, imageName, sizes} = request.body;
         if (!sourceUrl || !imageName || !sizes) {
             return responseMissingFields(sourceUrl, imageName, sizes, response);
@@ -119,7 +115,29 @@ router.route('/images/:id')
             return responseInvalidFields(invalidFields, response);
         }
 
-        response.status(202).append("Location", "/v1/queue/" + request.params.id).send();
+        const params = {
+            TableName: config.aws_table_name,
+            Key: {
+                "id": request.params.id
+            },
+            UpdateExpression: "set imageUrl=:url, imageName=:name, sizes=:sizes",
+            ConditionExpression: "attribute_exists(id)",
+            ExpressionAttributeValues: {
+                ":url": sourceUrl,
+                ":name": imageName,
+                ":sizes": sizes
+            }
+        };
+
+        database.update(params, function (error, data) {
+            if (error) {
+                if (error.code === 'ConditionalCheckFailedException') {
+                    return response.status(404).send();
+                }
+                return responseInternalServerError(response);
+            }
+            return response.status(202).append("Location", "/v1/queue/" + request.params.id).send();
+        })
 
     })
     .delete(function (request, response) {
