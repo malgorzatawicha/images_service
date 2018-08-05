@@ -141,11 +141,23 @@ router.route('/images/:id')
 
     })
     .delete(function (request, response) {
-        if (request.params.id === '1') {
-            return response.status(202).send();
-        }
+        const params = {
+            TableName: config.aws_table_name,
+            Key: {
+                "id": request.params.id
+            },
+            ConditionExpression: "attribute_exists(id)"
+        };
 
-        return response.status(204).send();
+        database.delete(params, function (error, data) {
+            if (error) {
+                if (error.code === 'ConditionalCheckFailedException') {
+                    return response.status(204).send();
+                }
+                return responseInternalServerError(response);
+            }
+            return response.status(202).send();
+        })
     })
 ;
 router.route('/queue/:id')
