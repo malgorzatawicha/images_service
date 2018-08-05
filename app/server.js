@@ -2,6 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const uuid = require('node-uuid');
 
 const AWS = require('aws-sdk');
 const config = require('./config');
@@ -108,7 +109,8 @@ router.route('/images')
             return responseInvalidFields(invalidFields, response);
         }
 
-        const id = "3";
+        const id = uuid.v4();
+
         response.status(202).append("Location", "/v1/queue/" + id).send();
 })
 ;
