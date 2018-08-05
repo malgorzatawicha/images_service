@@ -102,6 +102,18 @@ router.route('/images')
 })
 ;
 
+router.route('/queue/:id')
+    .get(function (request, response) {
+        if (request.params.id === '1') {
+            return response.send({data: {status: "pending"}});
+        }
+
+        if (request.params.id === '3') {
+            return response.status(303).append("Location", "/v1/images/" + request.params.id).send();
+        }
+
+        return response.status(404).send();
+    });
 
 function getInvalidFields(sourceUrl, imageName, sizes) {
     let invalidFields = {};
