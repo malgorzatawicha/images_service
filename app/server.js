@@ -42,9 +42,7 @@ router.route('/images')
                 return responseInternalServerError(response);
             }
             const { Items } = data;
-            return response.send({
-                data: Items
-            });
+            return response.send({data: Items.map(assembleItem)});
         });
     })
 
@@ -100,7 +98,7 @@ router.route('/images/:id')
                 return response.status(404).send();
             }
             return response.json({
-                data: Item
+                data: assembleItem(Item)
             });
         });
     })
@@ -235,6 +233,28 @@ function responseInternalServerError(response) {
     return response.status(500).send({
         message: 'Internal server error'
     });
+}
+
+function assembleItem (item) {
+    let result = {
+        'id': item.id,
+        'url': item.imageUrl,
+        'original': {
+            'width': 'todo',
+            'height': 'todo',
+            'url': 'todo'
+        }
+    };
+
+    for (let index in item.sizes) {
+        const name = "width" + item.sizes[index];
+        result[name] = {
+            'width': 'todo',
+            'height': 'todo',
+            'url': 'todo'
+        }
+    }
+    return result;
 }
 
 app.use('/v1', router);
