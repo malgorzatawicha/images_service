@@ -102,6 +102,34 @@ router.route('/images')
 })
 ;
 
+router.route('/images/:id')
+    .get(function (request, response) {
+        if (request.params.id === '1') {
+            return response.json({
+               id: 1,
+               url: "www.google.com",
+               imageName: "custom name",
+               original: {
+                   width: 1200,
+                   height: 900,
+                   url: "www.amazon.com/s3/image1/full",
+               },
+               width50: {
+                   width: 50,
+                   height: 40,
+                   url: "www.amazon.com/s3/image1/50"
+               },
+               width100: {
+                   width: 100,
+                   height: 80,
+                   url: "www.amazon.com/s3/image1/100"
+               }
+            });
+        }
+
+        return response.status(404).send();
+    })
+;
 router.route('/queue/:id')
     .get(function (request, response) {
         if (request.params.id === '1') {
