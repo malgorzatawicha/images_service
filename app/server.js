@@ -129,6 +129,24 @@ router.route('/images/:id')
 
         return response.status(404).send();
     })
+    .put(function (request, response) {
+        if (request.params.id !== '1') {
+            return response.status(404).send();
+        }
+
+        const {sourceUrl, imageName, sizes} = request.body;
+        if (!sourceUrl || !imageName || !sizes) {
+            return responseMissingFields(sourceUrl, imageName, sizes, response);
+        }
+        const invalidFields = getInvalidFields(sourceUrl, imageName, sizes);
+
+        if (Object.keys(invalidFields).length > 0) {
+            return responseInvalidFields(invalidFields, response);
+        }
+
+        response.status(202).append("Location", "/v1/queue/" + request.params.id).send();
+
+    })
 ;
 router.route('/queue/:id')
     .get(function (request, response) {
