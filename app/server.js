@@ -7,10 +7,8 @@ const uuid = require('node-uuid');
 const AWS = require('aws-sdk');
 const config = require('./config');
 if (process.env.NODE_ENV !== 'production') {
-    console.log(config.aws_local_config);
     AWS.config.update(config.aws_local_config);
 } else {
-    console.log(config.aws_remote_config);
     AWS.config.update(config.aws_remote_config);
 }
 const database = new AWS.DynamoDB.DocumentClient();
@@ -83,30 +81,27 @@ router.route('/images')
 
 router.route('/images/:id')
     .get(function (request, response) {
-        if (request.params.id === '1') {
-            return response.json({
-               id: 1,
-               url: "www.google.com",
-               imageName: "custom name",
-               original: {
-                   width: 1200,
-                   height: 900,
-                   url: "www.amazon.com/s3/image1/full",
-               },
-               width50: {
-                   width: 50,
-                   height: 40,
-                   url: "www.amazon.com/s3/image1/50"
-               },
-               width100: {
-                   width: 100,
-                   height: 80,
-                   url: "www.amazon.com/s3/image1/100"
-               }
-            });
-        }
 
-        return response.status(404).send();
+        const params = {
+            TableName: config.aws_table_name,
+            KeyConditionExpression: 'id = :id',
+            ExpressionAttributeValues: {
+                ':id': request.params.id
+            }
+        };
+
+        database.query(params, function (error, data) {
+            if (error) {
+                return responseInternalServerError(response);
+            }
+            const {Items} = data;
+            if (!Items || Items.length === 0) {
+                return response.status(404).send();
+            }
+            return response.json({
+                data: Items[0]
+            });
+        });
     })
     .put(function (request, response) {
         if (request.params.id !== '1') {
