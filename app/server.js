@@ -14,9 +14,6 @@ if (process.env.NODE_ENV !== 'production') {
     AWS.config.update(config.aws_remote_config);
 }
 const database = new AWS.DynamoDB.DocumentClient();
-const params = {
-    TableName: config.aws_table_name
-};
 
 // Constants
 const PORT = 80;
@@ -30,18 +27,15 @@ app.use(bodyParser.json());
 const router = express.Router();
 
 router.get('/', (request, response) => {
-
+    const params = {
+        TableName: config.aws_table_name
+    };
     database.scan(params, function(error, data) {
-        console.log('scan');
         if (error) {
             console.log(error);
-            return response.status(500).send({
-                message: 'Internal server error'
-            });
+            return responseInternalServerError(response);
         }
-        console.log(data);
         const { Items } = data;
-        console.log(Items);
         return response.send({
             data: Items
         });
@@ -111,7 +105,21 @@ router.route('/images')
 
         const id = uuid.v4();
 
-        response.status(202).append("Location", "/v1/queue/" + id).send();
+        const params = {
+            TableName: config.aws_table_name,
+            Item: {
+                id: id,
+                url: sourceUrl,
+                name: imageName,
+                sizes: sizes
+            }
+        };
+        database.put(params, function (error) {
+            if (error) {
+                return responseInternalServerError(response);
+            }
+            return response.status(202).append("Location", "/v1/queue/" + id).send();
+        })
 })
 ;
 
@@ -236,6 +244,12 @@ function responseMissingFields(sourceUrl, imageName, sizes, response) {
             description: "One or more fields are missing.",
             fields: errorFields
         }
+    });
+}
+
+function responseInternalServerError(response) {
+    return response.status(500).send({
+        message: 'Internal server error'
     });
 }
 
