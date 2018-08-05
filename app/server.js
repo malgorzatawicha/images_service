@@ -40,65 +40,65 @@ router.get('/', (request, response) => {
 
 router.route('/images')
     .get(function (request, response) {
-    response.json({
-        data: [
-            {
-                id: 1,
-                url: "www.google.com/image1",
-                imageName: "custom name",
-                original: {
-                    width: 1200,
-                    height: 900,
-                    url: "www.amazon.com/s3/image1/full"
+        response.json({
+            data: [
+                {
+                    id: 1,
+                    url: "www.google.com/image1",
+                    imageName: "custom name",
+                    original: {
+                        width: 1200,
+                        height: 900,
+                        url: "www.amazon.com/s3/image1/full"
+                    },
+                    width50: {
+                        width: 50,
+                        height: 40,
+                        url: "www.amazon.com/s3/image1/50"
+                    },
+                    width100: {
+                        width: 100,
+                        height: 80,
+                        url: "www.amazon.com/s3/image1/100"
+                    }
                 },
-                width50: {
-                    width: 50,
-                    height: 40,
-                    url: "www.amazon.com/s3/image1/50"
-                },
-                width100: {
-                    width: 100,
-                    height: 80,
-                    url: "www.amazon.com/s3/image1/100"
+                {
+                    id: 2,
+                    url: "www.google.com/image2",
+                    imageName: "second custom name",
+                    original: {
+                        width: 700,
+                        height: 700,
+                        url: "www.amazon.com/s3/image2/full"
+                    },
+                    width70: {
+                        width: 70,
+                        height: 70,
+                        url: "www.amazon.com/s3/image2/70"
+                    },
+                    width140: {
+                        width: 140,
+                        height: 140,
+                        url: "www.amazon.com/s3/image1/140"
+                    }
                 }
-            },
-            {
-                id: 2,
-                url: "www.google.com/image2",
-                imageName: "second custom name",
-                original: {
-                    width: 700,
-                    height: 700,
-                    url: "www.amazon.com/s3/image2/full"
-                },
-                width70: {
-                    width: 70,
-                    height: 70,
-                    url: "www.amazon.com/s3/image2/70"
-                },
-                width140: {
-                    width: 140,
-                    height: 140,
-                    url: "www.amazon.com/s3/image1/140"
-                }
-            }
-        ]
-    });
-})
+            ]
+        });
+    })
 
     .post(function (request, response) {
-    const {sourceUrl, imageName, sizes} = request.body;
-    if (!sourceUrl || !imageName || !sizes) {
-        responseMissingFields(sourceUrl, imageName, sizes, response);
-    }
-    const invalidFields = getInvalidFields(sourceUrl, imageName, sizes);
+        const {sourceUrl, imageName, sizes} = request.body;
+        if (!sourceUrl || !imageName || !sizes) {
+            return responseMissingFields(sourceUrl, imageName, sizes, response);
+        }
+        const invalidFields = getInvalidFields(sourceUrl, imageName, sizes);
 
-    if (Object.keys(invalidFields).length > 0) {
-        responseInvalidFields(invalidFields, response);
-    }
+        if (Object.keys(invalidFields).length > 0) {
+            return responseInvalidFields(invalidFields, response);
+        }
 
-    const id = "3";
-    response.status(202).append("Location", "/v1/queue/" + id).send();
+        const id = "3";
+        response.status(202).append("Location", "/v1/queue/" + id).send();
 })
 ;
 
