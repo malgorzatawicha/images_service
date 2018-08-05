@@ -2,13 +2,13 @@
   "TableName": "db_images",
   "KeySchema": [
     {
-      "AttributeName": "id",
+      "AttributeName": "imageId",
       "KeyType": "HASH"
     }
   ],
   "AttributeDefinitions": [
   {
-    "AttributeName": "id",
+    "AttributeName": "imageId",
     "AttributeType": "S"
   }
   ],

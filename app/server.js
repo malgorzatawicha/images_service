@@ -61,7 +61,7 @@ router.route('/images')
         const params = {
             TableName: config.aws_table_name,
             Item: {
-                id: id,
+                imageId: id,
                 imageUrl: sourceUrl,
                 imageName: imageName,
                 sizes: sizes
@@ -82,7 +82,7 @@ router.route('/images/:id')
         const params = {
             TableName: config.aws_table_name,
             Key: {
-                'id': request.params.id
+                'imageId': request.params.id
             }
         };
 
@@ -115,10 +115,10 @@ router.route('/images/:id')
         const params = {
             TableName: config.aws_table_name,
             Key: {
-                "id": request.params.id
+                "imageId": request.params.id
             },
             UpdateExpression: "set imageUrl=:url, imageName=:name, sizes=:sizes",
-            ConditionExpression: "attribute_exists(id)",
+            ConditionExpression: "attribute_exists(imageId)",
             ExpressionAttributeValues: {
                 ":url": sourceUrl,
                 ":name": imageName,
@@ -141,9 +141,9 @@ router.route('/images/:id')
         const params = {
             TableName: config.aws_table_name,
             Key: {
-                "id": request.params.id
+                "imageId": request.params.id
             },
-            ConditionExpression: "attribute_exists(id)"
+            ConditionExpression: "attribute_exists(imageId)"
         };
 
         database.delete(params, function (error, data) {
@@ -237,7 +237,7 @@ function responseInternalServerError(response, error) {
 
 function assembleItem (item) {
     let result = {
-        'id': item.id,
+        'id': item.imageId,
         'url': item.imageUrl,
         'original': {
             'width': 'todo',
