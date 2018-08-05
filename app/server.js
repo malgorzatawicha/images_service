@@ -35,6 +35,7 @@ app.get('/', (request, response) => {
     });
 });
 
+// @todo add pagination to request
 app.get('/v1/images', function (request, response) {
     response.json({
         data: [
