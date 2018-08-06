@@ -1,0 +1,103 @@
+{
+  "Records": [
+    {
+      "eventID": "370c9545adfe140a14ddf4d3576597fd",
+      "eventName": "INSERT",
+      "eventVersion": "1.1",
+      "eventSource": "aws:dynamodb",
+      "awsRegion": "eu-west-1",
+      "dynamodb": {
+        "ApproximateCreationDateTime": 1533574200,
+        "Keys": {
+          "imageId": {
+            "S": "200ada87-b6e5-45a0-87e4-842b7592fe01"
+          }
+        },
+        "NewImage": {
+          "imageId": {
+            "S": "200ada87-b6e5-45a0-87e4-842b7592fe01"
+          },
+          "imageName": {
+            "S": "custom image name"
+          },
+          "sizes": {
+            "L": [
+              {
+                "S": "50"
+              },
+              {
+                "S": "100"
+              }
+            ]
+          },
+          "imageUrl": {
+            "S": "https://pbs.twimg.com/profile_images/29139742/hasselhoff-david-photo-xl-david-hasselhoff-6210194_400x400.jpg"
+          }
+        },
+        "SequenceNumber": "100000000026346514836",
+        "SizeBytes": 156,
+        "StreamViewType": "NEW_IMAGE"
+      },
+      "eventSourceARN": "arn:aws:dynamodb:eu-west-1:323772228415:table/db_images/stream/2018-08-06T16:34:21.114"
+    },
+    {
+      "eventID": "bab5d288039951b22f11dc684108b4b0",
+      "eventName": "MODIFY",
+      "eventVersion": "1.1",
+      "eventSource": "aws:dynamodb",
+      "awsRegion": "eu-west-1",
+      "dynamodb": {
+        "ApproximateCreationDateTime": 1533574260,
+        "Keys": {
+          "imageId": {
+            "S": "200ada87-b6e5-45a0-87e4-842b7592fe01"
+          }
+        },
+        "NewImage": {
+          "imageId": {
+            "S": "200ada87-b6e5-45a0-87e4-842b7592fe01"
+          },
+          "imageName": {
+            "S": "custom image name3"
+          },
+          "sizes": {
+            "L": [
+              {
+                "S": "50"
+              },
+              {
+                "S": "100"
+              }
+            ]
+          },
+          "imageUrl": {
+            "S": "http://www.google.com"
+          }
+        },
+        "SequenceNumber": "200000000026346551629",
+        "SizeBytes": 157,
+        "StreamViewType": "NEW_IMAGE"
+      },
+      "eventSourceARN": "arn:aws:dynamodb:eu-west-1:323772228415:table/db_images/stream/2018-08-06T16:34:21.114"
+    },
+    {
+      "eventID": "e302af9dae3453ca3c8fea0312833aa6",
+      "eventName": "REMOVE",
+      "eventVersion": "1.1",
+      "eventSource": "aws:dynamodb",
+      "awsRegion": "eu-west-1",
+      "dynamodb": {
+        "ApproximateCreationDateTime": 1533574260,
+        "Keys": {
+          "imageId": {
+            "S": "200ada87-b6e5-45a0-87e4-842b7592fe01"
+          }
+        },
+        "SequenceNumber": "300000000026346562695",
+        "SizeBytes": 43,
+        "StreamViewType": "NEW_IMAGE"
+      },
+      "eventSourceARN": "arn:aws:dynamodb:eu-west-1:323772228415:table/db_images/stream/2018-08-06T16:34:21.114"
+    }
+  ]
+}
