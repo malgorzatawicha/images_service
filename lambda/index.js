@@ -4,8 +4,7 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 const s3 = new AWS.S3();
 
 exports.handler = function(events, context, callback) {
-    for (let index in events.Records) {
-        const event = events.Records[index];
+    events.Records.forEach((event) => {
         const dynamodb = event.dynamodb;
         if (event.eventName === 'INSERT') {
             insertRowListener(dynamodb.NewImage, 'mwicha-s3-bucket')
@@ -14,7 +13,7 @@ exports.handler = function(events, context, callback) {
                 }, callback);
 
         }
-    }
+    });
     console.log('Event: ', JSON.stringify(events, null, '\t'));
     console.log('Context: ', JSON.stringify(context, null, '\t'));
     callback(null);
