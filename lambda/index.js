@@ -15,11 +15,14 @@ exports.handler = function(events, context, callback) {
     events.Records.forEach((event) => {
         const dynamodb = event.dynamodb;
         if (event.eventName === 'INSERT') {
-            insertRowListener(dynamodb.NewImage)
+            insertRow(dynamodb.NewImage)
                 .then(v => {
                     return callback(null, v);
                 }, callback);
 
+        }
+        if (event.eventName === 'REMOVE') {
+            removeRow(dynamodb.Keys.imageId.S, dynamodb.OldImage.sizes.L);
         }
     });
     console.log('Event: ', JSON.stringify(events, null, '\t'));
@@ -28,7 +31,7 @@ exports.handler = function(events, context, callback) {
 };
 
 
-const insertRowListener = function (row) {
+const insertRow = function (row) {
     const url = row.imageUrl.S;
     const id = row.imageId.S;
     const sizes = row.sizes.L;
@@ -84,6 +87,12 @@ const insertRowListener = function (row) {
         });
 };
 
+const removeRow = (id, sizes) => {
+    s3.deleteObject({Bucket: bucket, Key: id + '/original'}, function(err, data) {});
+    sizes.forEach(function (size) {
+        s3.deleteObject({Bucket: bucket, Key: id + '/width' + size.S}, function(err, data) {});
+    })
+};
 const downloadFileFromExternalResource = function (url) {
   return fetch(url)
       .then((response) => {

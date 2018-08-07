@@ -81,23 +81,107 @@
       "eventSourceARN": "arn:aws:dynamodb:eu-west-1:323772228415:table/db_images/stream/2018-08-06T16:34:21.114"
     },
     {
-      "eventID": "e302af9dae3453ca3c8fea0312833aa6",
+      "eventID": "182e2f7f1bdba1ccb2c12283001a0b72",
       "eventName": "REMOVE",
       "eventVersion": "1.1",
       "eventSource": "aws:dynamodb",
       "awsRegion": "eu-west-1",
       "dynamodb": {
-        "ApproximateCreationDateTime": 1533574260,
+        "ApproximateCreationDateTime": 1533672360,
         "Keys": {
           "imageId": {
-            "S": "200ada87-b6e5-45a0-87e4-842b7592fe01"
+            "S": "f00f1559-a994-4a32-91a6-5a80b41d133a"
           }
         },
-        "SequenceNumber": "300000000026346562695",
-        "SizeBytes": 43,
-        "StreamViewType": "NEW_IMAGE"
+        "OldImage": {
+          "images": {
+            "M": {
+              "original": {
+                "M": {
+                  "width": {
+                    "N": "728"
+                  },
+                  "url": {
+                    "S": "http://s3-eu-west-1.amazonaws.com/mwicha-s3-bucket/f00f1559-a994-4a32-91a6-5a80b41d133a/original"
+                  },
+                  "height": {
+                    "N": "455"
+                  }
+                }
+              },
+              "width50": {
+                "M": {
+                  "width": {
+                    "N": "50"
+                  },
+                  "url": {
+                    "S": "http://s3-eu-west-1.amazonaws.com/mwicha-s3-bucket/f00f1559-a994-4a32-91a6-5a80b41d133a/width50"
+                  },
+                  "height": {
+                    "N": "31"
+                  }
+                }
+              },
+              "width100": {
+                "M": {
+                  "width": {
+                    "N": "100"
+                  },
+                  "url": {
+                    "S": "http://s3-eu-west-1.amazonaws.com/mwicha-s3-bucket/f00f1559-a994-4a32-91a6-5a80b41d133a/width100"
+                  },
+                  "height": {
+                    "N": "63"
+                  }
+                }
+              },
+              "width300": {
+                "M": {
+                  "width": {
+                    "N": "300"
+                  },
+                  "url": {
+                    "S": "http://s3-eu-west-1.amazonaws.com/mwicha-s3-bucket/f00f1559-a994-4a32-91a6-5a80b41d133a/width300"
+                  },
+                  "height": {
+                    "N": "188"
+                  }
+                }
+              }
+            }
+          },
+          "imageId": {
+            "S": "f00f1559-a994-4a32-91a6-5a80b41d133a"
+          },
+          "imageName": {
+            "S": "custom image name"
+          },
+          "sizes": {
+            "L": [
+              {
+                "S": "50"
+              },
+              {
+                "S": "100"
+              },
+              {
+                "S": "300"
+              }
+            ]
+          },
+          "imageUrl": {
+            "S": "https://articlebio.com/uploads/news/image/-baywatch-alum-david-hasselhoff-marries-longtime-girlfriend-hayley-roberts.jpg"
+          },
+          "imageStatus": {
+            "S": "active"
+          }
+        },
+        "SequenceNumber": "300000000014856187414",
+        "SizeBytes": 802,
+        "StreamViewType": "NEW_AND_OLD_IMAGES"
       },
-      "eventSourceARN": "arn:aws:dynamodb:eu-west-1:323772228415:table/db_images/stream/2018-08-06T16:34:21.114"
+      "eventSourceARN": "arn:aws:dynamodb:eu-west-1:323772228415:table/db_images/stream/2018-08-07T20:05:02.549"
     }
+
   ]
 }
