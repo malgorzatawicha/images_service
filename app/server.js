@@ -264,18 +264,18 @@ function assembleItem (item) {
         'id': item.imageId,
         'url': item.imageUrl,
         'original': {
-            'width': 'todo',
-            'height': 'todo',
-            'url': 'todo'
+            'width': item.images.original,
+            'height': item.images.height,
+            'url': item.images.url
         }
     };
 
     for (let index in item.sizes) {
         const name = "width" + item.sizes[index];
         result[name] = {
-            'width': 'todo',
-            'height': 'todo',
-            'url': 'todo'
+            'width': item.images[name].width,
+            'height': item.images[name].height,
+            'url': item.images[name].url
         }
     }
     return result;
