@@ -13,7 +13,7 @@ sleep 2
 # Create a table.
 aws dynamodb --endpoint-url http://localhost:8000 --region eu-west-1 \
 	create-table \
-        --cli-input-json file:///Users/mwicha/docker-dynamodb/samples/test-data/db_images.json
+        --cli-input-json file:///$(pwd)/db_images.json
 
 echo "Stopping..."
 docker stop $ID && docker rm $ID || true
