@@ -35,9 +35,9 @@ router.route('/images')
 
         const params = {
             TableName: config.aws_table_name,
-            FilterExpression: "#status = :activeStatus",
+            FilterExpression: "#imageStatus = :activeStatus",
             ExpressionAttributeNames: {
-                "#status": "status",
+                "#imageStatus": "imageStatus",
             },
             ExpressionAttributeValues: {
                 ":activeStatus": 'active'
@@ -71,7 +71,7 @@ router.route('/images')
                 imageId: id,
                 imageUrl: sourceUrl,
                 imageName: imageName,
-                status: 'inactive',
+                imageStatus: 'inactive',
                 sizes: sizes
             }
         };
@@ -101,7 +101,7 @@ router.route('/images/:id')
 
             const {Item} = data;
 
-            if (!Item || Item.status !== 'active') {
+            if (!Item || Item.imageStatus !== 'active') {
                 return response.status(404).send();
             }
             return response.json({
@@ -125,7 +125,7 @@ router.route('/images/:id')
             Key: {
                 "imageId": request.params.id
             },
-            UpdateExpression: "set imageUrl=:url, imageName=:name, sizes=:sizes, status=:status",
+            UpdateExpression: "set imageUrl=:url, imageName=:name, sizes=:sizes, imageStatus=:status",
             ConditionExpression: "attribute_exists(imageId)",
             ExpressionAttributeValues: {
                 ":url": sourceUrl,
@@ -186,7 +186,7 @@ router.route('/queue/:id')
                 return response.status(404).send();
             }
 
-            if (Item.status === 'inactive') {
+            if (Item.imageStatus === 'inactive') {
                 return response.send({data: {status: "pending"}});
             }
 
