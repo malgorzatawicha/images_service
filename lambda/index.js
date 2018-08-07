@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const sharp = require('sharp');
 
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
@@ -28,53 +29,17 @@ const insertRowListener = function (row) {
     const id = row.imageId.S;
     const sizes = row.sizes.L;
 
-    const params = {
-        TableName: tableName,
-        Item: {
-            imageId: id,
-            imageUrl: url,
-            imageName: row.imageName.S,
-            sizes: sizes,
-            status: 'active',
-            images: {
-                original: {
-                    width: 1,
-                    height: 2,
-                    url: "aaa"
-                }
-            }
-        }
-    };
-
-    sizes.reduce(function(params, size) {
-        params.images["width" + size] = {
-            width: size,
-            height: size,
-            url: size
-        }
-    }, params);
-
     return downloadFileFromExternalResource(url)
         .then((buffer) => {
-
             let sequence = saveToS3Promise(buffer, id + "/original");
 
             return sizes.reduce((sequence, size) => {
-                return sequence.then(
-                    () => {
-                        return changeSizePromise(buffer, size.S).then((resizedObject) => {
-                            params.images['width' + size.S].width = resizedObject.width;
-                            params.images['width' + size.S].height = resizedObject.height;
-                            return resizedObject;
-                        })
-                    })
-                    .then((miniBuffer) => {
-                        saveToS3Promise(miniBuffer, id + '/width' + size.S);
-                        params.images['width' + size.S].url = 'url to s3';
-                    });
+
+                return sequence.then(changeSizePromise(buffer, size.S));
+//                return sequence.then(changeSizePromise(buffer, size.S))
+  //                  .then((miniBuffer) => saveToS3Promise(miniBuffer, id + '/width' + size.S))
+
             }, sequence);
-        }).then(() => {
-            dynamoDbPut(params);
         });
 };
 
@@ -98,5 +63,5 @@ const saveToS3Promise = (buffer, key) => {
 };
 
 const changeSizePromise = (buffer, size) => {
-  return 'promise';
+  return sharp(buffer).resize(parseInt(size), null).toBuffer();
 };
