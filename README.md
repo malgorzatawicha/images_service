@@ -5,7 +5,7 @@
 - `terraform`
 - Account on AWS
 
-### Launch project locally
+### Launch project locally (Node.js + dynamoDB)
 
 ```
 cd <project_directory>
