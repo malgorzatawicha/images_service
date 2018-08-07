@@ -31,6 +31,15 @@ data "aws_iam_policy_document" "lambda-allow-all" {
   }
 }
 
+resource "aws_s3_bucket" "images_bucket" {
+  bucket = "${var.s3_bucket}"
+  acl    = "public"
+
+  tags {
+    Name = "Public bucket with images"
+  }
+}
+
 resource "aws_lambda_function" "images_lambda" {
   function_name = "images_lambda"
   handler = "index.handler"
@@ -41,7 +50,8 @@ resource "aws_lambda_function" "images_lambda" {
   timeout = 5
   environment {
     variables = {
-      BUCKET = "${var.s3_bucket}"
+      BUCKET = "${aws_s3_bucket.images_bucket.bucket}",
+      TABLE = "${aws_dynamodb_table.db_images.name}"
     }
   }
 }
