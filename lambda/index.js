@@ -35,9 +35,10 @@ const insertRowListener = function (row) {
 
             return sizes.reduce((sequence, size) => {
 
-                return sequence.then(changeSizePromise(buffer, size.S));
-//                return sequence.then(changeSizePromise(buffer, size.S))
-  //                  .then((miniBuffer) => saveToS3Promise(miniBuffer, id + '/width' + size.S))
+                return sequence.then(changeSizePromise(buffer, size.S))
+                    .then(({data, info}) => {
+                        return saveToS3Promise(data, id + '/width' + size.S);
+                    })
 
             }, sequence);
         });
@@ -55,6 +56,7 @@ const downloadFileFromExternalResource = function (url) {
 };
 
 const saveToS3Promise = (buffer, key) => {
+    console.log(buffer);
     return s3.putObject({
         Bucket: bucket,
         Key: key,
@@ -63,5 +65,6 @@ const saveToS3Promise = (buffer, key) => {
 };
 
 const changeSizePromise = (buffer, size) => {
-  return sharp(buffer).resize(parseInt(size), null).toBuffer();
+  return () => sharp(buffer).resize(parseInt(size), null)
+      .toBuffer({ resolveWithObject: true });
 };
