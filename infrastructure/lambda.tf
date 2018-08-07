@@ -38,6 +38,7 @@ resource "aws_lambda_function" "images_lambda" {
   filename = "${path.module}/../lambda/function.zip"
   source_code_hash = "${base64sha256(file("${path.module}/../lambda/function.zip"))}"
   role = "${aws_iam_role.lambda_role.arn}"
+  timeout = 5
   environment {
     variables = {
       BUCKET = "${var.s3_bucket}"
