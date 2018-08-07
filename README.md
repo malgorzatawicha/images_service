@@ -50,6 +50,6 @@ docker tag images/application:latest <account_id>.dkr.ecr.eu-west-1.amazonaws.co
 ```
 Push image to AWS:
 ```
-aws ecr get-login --no-include-email --region eu-west-1
+$(aws ecr get-login --no-include-email --region eu-west-1)
 docker push <account_id>.dkr.ecr.eu-west-1.amazonaws.com/images/application:latest
 ```

@@ -56,7 +56,7 @@ resource "aws_lb_target_group" "images_load_balancer_target_group" {
     healthy_threshold = 3
     unhealthy_threshold = 3
     matcher = "200"
-    path = "/"
+    path = "/v1"
     timeout = 5
   }
   tags {
