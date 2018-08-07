@@ -61,6 +61,7 @@ const saveToS3Promise = (buffer, key) => {
         Bucket: bucket,
         Key: key,
         Body: buffer,
+        ACL: 'public-read'
     }).promise();
 };
 
