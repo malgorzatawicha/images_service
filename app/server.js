@@ -34,7 +34,14 @@ router.route('/images')
     .get(function (request, response) {
 
         const params = {
-            TableName: config.aws_table_name
+            TableName: config.aws_table_name,
+            FilterExpression: "#status = :activeStatus",
+            ExpressionAttributeNames: {
+                "#status": "status",
+            },
+            ExpressionAttributeValues: {
+                ":activeStatus": 'active'
+            }
         };
         database.scan(params, function(error, data) {
             if (error) {
@@ -64,6 +71,7 @@ router.route('/images')
                 imageId: id,
                 imageUrl: sourceUrl,
                 imageName: imageName,
+                status: 'inactive',
                 sizes: sizes
             }
         };
@@ -93,7 +101,7 @@ router.route('/images/:id')
 
             const {Item} = data;
 
-            if (!Item) {
+            if (!Item || Item.status !== 'active') {
                 return response.status(404).send();
             }
             return response.json({
@@ -117,12 +125,13 @@ router.route('/images/:id')
             Key: {
                 "imageId": request.params.id
             },
-            UpdateExpression: "set imageUrl=:url, imageName=:name, sizes=:sizes",
+            UpdateExpression: "set imageUrl=:url, imageName=:name, sizes=:sizes, status=:status",
             ConditionExpression: "attribute_exists(imageId)",
             ExpressionAttributeValues: {
                 ":url": sourceUrl,
                 ":name": imageName,
-                ":sizes": sizes
+                ":sizes": sizes,
+                ":status": 'inactive'
             }
         };
 
@@ -159,15 +168,30 @@ router.route('/images/:id')
 ;
 router.route('/queue/:id')
     .get(function (request, response) {
-        if (request.params.id === '1') {
-            return response.send({data: {status: "pending"}});
-        }
+        const params = {
+            TableName: config.aws_table_name,
+            Key: {
+                'imageId': request.params.id
+            }
+        };
 
-        if (request.params.id === '3') {
+        database.get(params, function (error, data) {
+            if (error) {
+                return responseInternalServerError(response, error);
+            }
+
+            const {Item} = data;
+
+            if (!Item) {
+                return response.status(404).send();
+            }
+
+            if (Item.status === 'inactive') {
+                return response.send({data: {status: "pending"}});
+            }
+
             return response.status(303).append("Location", "/v1/images/" + request.params.id).send();
-        }
-
-        return response.status(404).send();
+        });
     });
 
 function getInvalidFields(sourceUrl, imageName, sizes) {
