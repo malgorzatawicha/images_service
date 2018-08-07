@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "lambda-allow-all" {
 
 resource "aws_s3_bucket" "images_bucket" {
   bucket = "${var.s3_bucket}"
-  acl    = "public"
+  acl    = "public-read"
 
   tags {
     Name = "Public bucket with images"
