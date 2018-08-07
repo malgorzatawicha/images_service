@@ -51,7 +51,8 @@ resource "aws_lambda_function" "images_lambda" {
   environment {
     variables = {
       BUCKET = "${aws_s3_bucket.images_bucket.bucket}",
-      TABLE = "${aws_dynamodb_table.db_images.name}"
+      TABLE = "${aws_dynamodb_table.db_images.name}",
+      REGION = "${var.region}"
     }
   }
 }

@@ -7,8 +7,9 @@ const s3 = new AWS.S3();
 const database = new AWS.DynamoDB.DocumentClient();
 
 
-const tableName = 'db_images';
-const bucket = 'mwicha-s3-bucket';
+const tableName = process.env.TABLE;
+const bucket = process.env.BUCKET;
+const region = process.env.REGION;
 
 exports.handler = function(events, context, callback) {
     events.Records.forEach((event) => {
@@ -44,7 +45,7 @@ const insertRowListener = function (row) {
                     images.original = {
                         width: metadata.width,
                         height: metadata.height,
-                        url: "http://s3.amazonaws.com/" + bucket + "/" + id + "/original"
+                        url: buildS3Url(id, 'original')
                     };
                 })
             ;
@@ -54,7 +55,7 @@ const insertRowListener = function (row) {
                 return sequence.then(changeSizePromise(buffer, size.S))
                     .then(({data, info}) => {
                         images['width' + size.S] = {
-                            url: "http://s3.amazonaws.com/" + bucket + "/" + id + "/width" + size.S,
+                            url: buildS3Url(id, 'width' + size.S),
                             width: info.width,
                             height: info.height
                         };
@@ -110,4 +111,8 @@ const changeSizePromise = (buffer, size) => {
 
 const findSizePromise = (buffer) => {
     return () => sharp(buffer).metadata()
+};
+
+const buildS3Url = (id, key) => {
+    return "http://s3-" + region + ".amazonaws.com/" + bucket + "/" + id + "/" + key
 };
