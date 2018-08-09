@@ -15,16 +15,14 @@ exports.handler = function(events, context, callback) {
     events.Records.forEach((event) => {
         const dynamodb = event.dynamodb;
         const imageId = dynamodb.Keys.imageId.S;
-        const oldImageSizes = dynamodb.OldImage.sizes.L.map((size) => size.S);
 
-        if (event.eventName === 'INSERT') {
-            insertRow(dynamodb.NewImage);
-        }
-        if (event.eventName === 'REMOVE') {
+        if (event.eventName === 'REMOVE' || event.eventName === 'MODIFY') {
+            const oldImageSizes = dynamodb.OldImage.sizes.L.map((size) => size.S);
+
             removeRow(imageId, oldImageSizes);
         }
-        if (event.eventName === 'MODIFY') {
-            removeRow(imageId, oldImageSizes);
+
+        if (event.eventName === 'INSERT' || event.eventName === 'MODIFY') {
             insertRow(dynamodb.NewImage);
         }
     });
