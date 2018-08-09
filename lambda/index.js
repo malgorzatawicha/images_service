@@ -14,15 +14,18 @@ const region = process.env.REGION;
 exports.handler = function(events, context, callback) {
     events.Records.forEach((event) => {
         const dynamodb = event.dynamodb;
-        if (event.eventName === 'INSERT') {
-            insertRow(dynamodb.NewImage)
-                .then(v => {
-                    return callback(null, v);
-                }, callback);
+        const imageId = dynamodb.Keys.imageId.S;
+        const oldImageSizes = dynamodb.OldImage.sizes.L.map((size) => size.S);
 
+        if (event.eventName === 'INSERT') {
+            insertRow(dynamodb.NewImage);
         }
         if (event.eventName === 'REMOVE') {
-            removeRow(dynamodb.Keys.imageId.S, dynamodb.OldImage.sizes.L);
+            removeRow(imageId, oldImageSizes);
+        }
+        if (event.eventName === 'MODIFY') {
+            removeRow(imageId, oldImageSizes);
+            insertRow(dynamodb.NewImage);
         }
     });
     console.log('Event: ', JSON.stringify(events, null, '\t'));
@@ -40,7 +43,6 @@ const insertRow = function (row) {
 
     return downloadFileFromExternalResource(url)
         .then((buffer) => {
-
 
             let sequence = saveToS3Promise(buffer, id + "/original")
                 .then(findSizePromise(buffer))
