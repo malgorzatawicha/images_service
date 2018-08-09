@@ -28,8 +28,6 @@ exports.handler = function(events, context, callback) {
             insertRow(dynamodb.NewImage);
         }
     });
-    console.log('Event: ', JSON.stringify(events, null, '\t'));
-    console.log('Context: ', JSON.stringify(context, null, '\t'));
     callback(null);
 };
 
@@ -37,7 +35,7 @@ exports.handler = function(events, context, callback) {
 const insertRow = function (row) {
     const url = row.imageUrl.S;
     const id = row.imageId.S;
-    const sizes = row.sizes.L;
+    const sizes = row.sizes.L.map((size) => size.S);
 
     const images = {};
 
@@ -57,14 +55,15 @@ const insertRow = function (row) {
 
             return sizes.reduce((sequence, size) => {
 
-                return sequence.then(changeSizePromise(buffer, size.S))
+                return sequence.then(changeSizePromise(buffer, size))
                     .then(({data, info}) => {
-                        images['width' + size.S] = {
-                            url: buildS3Url(id, 'width' + size.S),
+                        const key = 'width' + size;
+                        images[key] = {
+                            url: buildS3Url(id, key),
                             width: info.width,
                             height: info.height
                         };
-                        return saveToS3Promise(data, id + '/width' + size.S);
+                        return saveToS3Promise(data, id + '/' + key);
                     })
             }, sequence);
         }).then(() => {
@@ -91,8 +90,9 @@ const insertRow = function (row) {
 
 const removeRow = (id, sizes) => {
     s3.deleteObject({Bucket: bucket, Key: id + '/original'}, function(err, data) {});
+
     sizes.forEach(function (size) {
-        s3.deleteObject({Bucket: bucket, Key: id + '/width' + size.S}, function(err, data) {});
+        s3.deleteObject({Bucket: bucket, Key: id + '/width' + size}, function(err, data) {});
     })
 };
 const downloadFileFromExternalResource = function (url) {
@@ -116,12 +116,14 @@ const saveToS3Promise = (buffer, key) => {
 };
 
 const changeSizePromise = (buffer, size) => {
-  return () => sharp(buffer).resize(parseInt(size), null)
+  return () => sharp(buffer)
+      .resize(parseInt(size), null)
       .toBuffer({ resolveWithObject: true });
 };
 
 const findSizePromise = (buffer) => {
-    return () => sharp(buffer).metadata()
+    return () => sharp(buffer)
+        .metadata()
 };
 
 const buildS3Url = (id, key) => {
